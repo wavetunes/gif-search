@@ -1,0 +1,88 @@
+@use '@angular/material' as mat;
+
+.app-header {
+  position: sticky;
+  z-index: 10;
+  inset-block-start: 0;
+  border-block-end: var(--app-border);
+  background-color: color-mix(in srgb, var(--app-card-background) 85%, transparent);
+  backdrop-filter: saturate(180%) blur(12px);
+}
+
+.app-header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--app-space-md);
+  max-width: var(--app-content-max-width);
+  block-size: var(--app-header-height);
+  margin-inline: auto;
+  padding-inline: var(--app-space-md);
+  box-sizing: border-box;
+}
+
+.app-header-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--app-space-xs);
+  border-radius: var(--app-radius-sm);
+  color: inherit;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: var(--app-focus-ring-width) solid var(--app-accent);
+    outline-offset: var(--app-focus-ring-offset);
+  }
+}
+
+.app-header-logo {
+  display: inline-flex;
+  inline-size: var(--app-space-xl);
+  block-size: var(--app-space-xl);
+  border-radius: var(--app-radius-sm);
+  background-color: var(--app-accent);
+  box-shadow: var(--app-shadow-sm);
+
+  svg {
+    inline-size: 100%;
+    block-size: 100%;
+    fill: var(--mat-sys-on-primary);
+  }
+}
+
+.app-header-title {
+  margin: 0;
+  font: var(--mat-sys-title-medium);
+  font-weight: 600;
+  letter-spacing: var(--app-tracking-tight);
+}
+
+.app-header-theme-toggle {
+  color: var(--mat-sys-on-surface-variant);
+
+  @include mat.icon-button-overrides(
+    (
+      container-shape: var(--app-radius-sm),
+    )
+  );
+
+  &:hover {
+    color: var(--mat-sys-on-surface);
+  }
+}
+
+.app-content {
+  animation: app-content-fade-in 240ms ease-out;
+}
+
+@keyframes app-content-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-content {
+    animation: none;
+  }
+}

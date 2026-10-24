@@ -1,0 +1,160 @@
+<main class="gif-details-page">
+  <a
+    class="gif-details-back"
+    matButton
+    routerLink="/"
+    data-testid="back-button"
+    [queryParams]="backQueryParams()"
+  >
+    <span class="app-button-content">
+      <app-icon name="arrow-left" />
+      Back to search
+    </span>
+  </a>
+
+  <section class="gif-details-card">
+    @if (gif.isLoading()) {
+      <div
+        class="gif-details-loading"
+        role="status"
+        aria-label="Loading GIF"
+        data-testid="loading-state"
+      >
+        <div class="gif-details-loading-media app-skeleton"></div>
+        <div class="gif-details-loading-info">
+          <div class="gif-details-loading-line app-skeleton"></div>
+          <div class="gif-details-loading-line gif-details-loading-line-short app-skeleton"></div>
+          <div class="gif-details-loading-line gif-details-loading-line-short app-skeleton"></div>
+        </div>
+      </div>
+    } @else if (errorKind(); as kind) {
+      <div class="gif-details-state" data-testid="error-state">
+        <span class="gif-details-state-icon">
+          <app-icon name="alert-circle" />
+        </span>
+        <p class="gif-details-state-title" role="alert" [attr.data-testid]="kind + '-message'">
+          {{ errorMessages[kind] }}
+        </p>
+        @if (kind !== 'not-found') {
+          <button
+            class="app-button-secondary"
+            matButton="outlined"
+            type="button"
+            data-testid="retry-button"
+            (click)="onRetry()"
+          >
+            Try again
+          </button>
+        }
+      </div>
+    } @else if (gif.hasValue()) {
+      @let details = gif.value();
+      <article class="gif-details" data-testid="gif-details">
+        <div class="gif-details-media">
+          <img
+            class="gif-details-image"
+            data-testid="gif-image"
+            [src]="details.displayUrl"
+            [alt]="details.altText"
+            [width]="details.width"
+            [height]="details.height"
+          />
+        </div>
+
+        <div class="gif-details-info">
+          <header class="gif-details-header">
+            @if (details.title; as title) {
+              <h2 class="gif-details-title" data-testid="gif-title">{{ title }}</h2>
+            }
+
+            @if (details.author; as author) {
+              <div class="gif-details-author">
+                @if (author.avatarUrl; as avatarUrl) {
+                  <img
+                    class="gif-details-avatar"
+                    alt=""
+                    data-testid="gif-avatar"
+                    width="40"
+                    height="40"
+                    [src]="avatarUrl"
+                  />
+                } @else {
+                  <span class="gif-details-avatar gif-details-avatar-fallback" aria-hidden="true">
+                    {{ author.username.charAt(0) }}
+                  </span>
+                }
+                <div class="gif-details-author-text">
+                  <span class="gif-details-author-label">Author</span>
+                  <span class="gif-details-author-name" data-testid="gif-author">{{
+                    author.username
+                  }}</span>
+                </div>
+              </div>
+            }
+          </header>
+
+          <dl class="gif-details-meta">
+            @if (details.createdAt; as createdAt) {
+              <div class="gif-details-meta-row">
+                <dt>Created</dt>
+                <dd data-testid="gif-created">{{ createdAt | date: 'mediumDate' }}</dd>
+              </div>
+            }
+
+            @if (details.uploadedAt; as uploadedAt) {
+              <div class="gif-details-meta-row">
+                <dt>Uploaded</dt>
+                <dd data-testid="gif-uploaded">{{ uploadedAt | date: 'mediumDate' }}</dd>
+              </div>
+            }
+
+            @if (details.rating; as rating) {
+              <div class="gif-details-meta-row">
+                <dt>Rating</dt>
+                <dd>
+                  <span class="gif-details-badge" data-testid="gif-rating">{{
+                    rating | uppercase
+                  }}</span>
+                </dd>
+              </div>
+            }
+
+            <div class="gif-details-meta-row">
+              <dt>Dimensions</dt>
+              <dd data-testid="gif-dimensions">{{ details.width }} × {{ details.height }} px</dd>
+            </div>
+          </dl>
+
+          <div class="gif-details-actions">
+            <button
+              class="app-button-primary"
+              matButton="filled"
+              type="button"
+              data-testid="download-button"
+              disabledInteractive
+              [disabled]="isDownloading()"
+              (click)="onDownload(details)"
+            >
+              <span class="app-button-content">
+                <app-icon name="download" />
+                Download
+              </span>
+            </button>
+            <button
+              class="app-button-secondary"
+              matButton="outlined"
+              type="button"
+              data-testid="copy-link-button"
+              (click)="onCopyLink(details)"
+            >
+              <span class="app-button-content">
+                <app-icon name="link" />
+                Copy link
+              </span>
+            </button>
+          </div>
+        </div>
+      </article>
+    }
+  </section>
+</main>

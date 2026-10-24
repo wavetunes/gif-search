@@ -1,0 +1,153 @@
+<main class="search-page">
+  <form
+    class="search-form"
+    role="search"
+    aria-label="Search GIFs"
+    (submit)="$event.preventDefault(); onSubmit()"
+  >
+    <mat-form-field class="search-form-field" appearance="outline" subscriptSizing="dynamic">
+      <app-icon class="search-form-icon" matIconPrefix name="search" />
+      <input
+        #searchInput
+        matInput
+        type="search"
+        maxlength="50"
+        placeholder="Search GIFs…"
+        aria-label="Keyword"
+        data-testid="search-input"
+        [value]="q()"
+      />
+    </mat-form-field>
+
+    <button class="app-button-primary" matButton="filled" type="submit" data-testid="search-submit">
+      Search
+    </button>
+  </form>
+
+  <section class="search-results" aria-labelledby="search-results-title">
+    <div class="search-results-header">
+      <h2 id="search-results-title" class="search-results-title" data-testid="results-title">
+        @if (query(); as query) {
+          Results for “{{ query }}”
+        } @else {
+          <app-icon class="search-results-title-icon" name="trending" />
+          Trending now
+        }
+      </h2>
+      <div role="status">
+        @if (query() && !isFirstPageLoading() && !isFirstPageError()) {
+          @let total = totalCount();
+          <span class="search-results-count" data-testid="result-count">
+            @if (gifs().length) {
+              {{ gifs().length }} of {{ total | number }} {{ total === 1 ? 'result' : 'results' }}
+            } @else {
+              0 results
+            }
+          </span>
+        }
+      </div>
+    </div>
+
+    @if (isFirstPageLoading()) {
+      <div
+        class="gif-grid-skeleton"
+        role="status"
+        aria-label="Loading GIFs"
+        data-testid="loading-state"
+        [style.--gif-grid-column-count]="columnCount()"
+      >
+        @for (item of skeletonItems; track $index) {
+          <div class="gif-grid-skeleton-item app-skeleton"></div>
+        }
+      </div>
+    } @else if (isFirstPageError()) {
+      <div class="search-page-state" data-testid="error-state">
+        <span class="search-page-state-icon search-page-state-icon-error">
+          <app-icon name="alert-circle" />
+        </span>
+        <p class="search-page-state-title" role="alert">{{ errorMessage() }}</p>
+        <button
+          class="app-button-secondary"
+          matButton="outlined"
+          type="button"
+          data-testid="retry-button"
+          (click)="onRetry()"
+        >
+          Try again
+        </button>
+      </div>
+    } @else if (gifs().length === 0) {
+      <div class="search-page-state" data-testid="empty-state">
+        <span class="search-page-state-icon">
+          <app-icon name="search-x" />
+        </span>
+        <p class="search-page-state-title">No GIFs found</p>
+        <p class="search-page-state-text">Try a different or shorter keyword.</p>
+      </div>
+    } @else {
+      <ul class="gif-grid" data-testid="gif-grid" [style.--gif-grid-column-count]="columnCount()">
+        @for (gif of gifs(); track gif.id; let index = $index) {
+          @let placement = gifLayout()[index];
+          <li
+            class="gif-grid-item app-skeleton"
+            [style.grid-column]="placement.column + 1"
+            [style.--gif-grid-item-offset-ratio]="placement.offsetRatio"
+            [style.--gif-grid-item-offset-count]="placement.offsetCount"
+          >
+            <a
+              class="gif-grid-link"
+              data-testid="gif-link"
+              [routerLink]="['/gif', gif.id]"
+              [queryParams]="{ q: query() || null }"
+            >
+              <img
+                #image
+                class="gif-image"
+                [attr.loading]="index < eagerImageCount ? 'eager' : 'lazy'"
+                [src]="gif.preview.url"
+                [alt]="gif.altText"
+                [width]="gif.preview.width"
+                [height]="gif.preview.height"
+                (load)="onImageLoad(gif, image)"
+              />
+            </a>
+          </li>
+        }
+      </ul>
+
+      @if (errorMessage(); as message) {
+        <div class="search-page-state search-page-state-inline" data-testid="load-more-error">
+          <p class="search-page-state-text search-page-state-text-error" role="alert">
+            <app-icon name="alert-circle" />
+            {{ message }}
+          </p>
+          <button
+            class="app-button-secondary"
+            matButton="outlined"
+            type="button"
+            data-testid="retry-button"
+            (click)="onRetry()"
+          >
+            Try again
+          </button>
+        </div>
+      } @else if (hasMore() || isLoadingMore()) {
+        <button
+          class="app-button-secondary search-page-load-more"
+          matButton="outlined"
+          type="button"
+          data-testid="load-more-button"
+          [attr.aria-busy]="isLoadingMore()"
+          (click)="onLoadMore()"
+        >
+          @if (isLoadingMore()) {
+            <mat-progress-spinner mode="indeterminate" aria-hidden="true" [diameter]="16" />
+          }
+          Load more
+        </button>
+      } @else {
+        <p class="search-page-end">You’ve reached the end</p>
+      }
+    }
+  </section>
+</main>

@@ -1,0 +1,31 @@
+<header class="app-header">
+  <div class="app-header-inner">
+    <a
+      class="app-header-brand"
+      routerLink="/"
+      aria-label="GIF Search, go to home"
+      data-testid="header-home-link"
+    >
+      <span class="app-header-logo" aria-hidden="true">
+        <svg viewBox="0 0 32 32" focusable="false"><path d="M13 10.5v11l9-5.5z" /></svg>
+      </span>
+      <h1 class="app-header-title">GIF Search</h1>
+    </a>
+
+    @let isDark = theme() === 'dark';
+    <button
+      class="app-header-theme-toggle"
+      matIconButton
+      type="button"
+      data-testid="theme-toggle"
+      [attr.aria-label]="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
+      [title]="isDark ? 'Switch to light theme' : 'Switch to dark theme'"
+      (click)="onToggleTheme()"
+    >
+      <app-icon [name]="isDark ? 'sun' : 'moon'" />
+    </button>
+  </div>
+</header>
+<div class="app-content">
+  <router-outlet />
+</div>
