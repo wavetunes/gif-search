@@ -7,9 +7,7 @@ copying its link and downloading it.
 
 ## Live demo
 
-https://<your-github-username>.github.io/gif-search/
-
-> Replace `<your-github-username>` with the GitHub account the repository is pushed to.
+https://wavetunes.github.io/gif-search/
 
 `.github/workflows/deploy.yml` lints, tests and builds the app, then deploys it to GitHub Pages on
 every push to `main`. Enable it once under **Settings → Pages → Source: GitHub Actions**. The build
